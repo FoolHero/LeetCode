@@ -1,6 +1,17 @@
 package com.wzy.train;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.Stack;
+
 /**
  * @Author: wzy
  * @Description:
@@ -8,8 +19,18 @@ package com.wzy.train;
  */
 public class Main {
 
+    private volatile static  Main singleton ;
 
-
+    public static Main getInstance() {
+        if (singleton == null) {
+            synchronized (Main.class) {
+                if (singleton == null) {
+                    singleton = new Main();
+                }
+            }
+        }
+        return singleton;
+    }
 
     /**
      * LC_13:罗马数字转整数
@@ -223,12 +244,331 @@ public class Main {
         return res;
     }
 
-    public static void main(String[] args) {
-        int[] nums = {-2,1,-3,4,-1,2,1,-5,4};
-        System.out.println(maxSubArray(nums));
 
-//        System.out.println(longestCommonPrefix(strs));
+    /**
+     * 88. 合并两个有序数组
+     */
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        // Make a copy of nums1.
+        int [] nums1_copy = new int[m];
+        System.arraycopy(nums1, 0, nums1_copy, 0, m);
+
+        // Two get pointers for nums1_copy and nums2.
+        int p1 = 0;
+        int p2 = 0;
+
+        // Set pointer for nums1
+        int p = 0;
+
+        // Compare elements from nums1_copy and nums2
+        // and add the smallest one into nums1.
+        while ((p1 < m) && (p2 < n))
+            nums1[p++] = (nums1_copy[p1] < nums2[p2]) ? nums1_copy[p1++] : nums2[p2++];
+
+        // if there are still elements to add
+        if (p1 < m)
+            System.arraycopy(nums1_copy, p1, nums1, p1 + p2, m + n - p1 - p2);
+        if (p2 < n)
+            System.arraycopy(nums2, p2, nums1, p1 + p2, m + n - p1 - p2);
     }
+
+
+    /**
+     * 107. 二叉树的层次遍历 II
+     */
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<List<Integer>>();
+        if(null == root){
+            return result;
+        }
+        Queue<TreeNode> queue = new LinkedList<TreeNode>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            List<Integer> temp = new ArrayList<Integer>();
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+                temp.add(node.val);
+            }
+            result.add(temp);
+        }
+        Collections.reverse(result);
+        return result;
+    }
+
+
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if (root == null) {
+            return false;
+        }
+        if (root.left == null && root.right == null) {
+            return sum - root.val == 0;
+        }
+        return hasPathSum(root.left, sum - root.val)
+                || hasPathSum(root.right, sum - root.val);
+
+    }
+
+
+    public static int maxProfit(int[] prices) {
+        int sum = 0;
+        for (int i = 0; i < prices.length - 1; i++) {
+            if (prices[i + 1] - prices[i] > 0) {
+                sum += prices[i + 1] - prices[i];
+            }
+        }
+        return sum;
+    }
+
+
+
+
+    public static boolean isPalindrome(String s) {
+        if (s == null) return false;
+        if (s.length() <= 1) return true;
+        char[] sc = s.toLowerCase().toCharArray();
+        int start = 0;
+        int end = sc.length - 1;
+        while (end >= start) {
+            while (end >= start && !Character.isLetterOrDigit(sc[start])) start++;
+            while (end >= start && !Character.isLetterOrDigit(sc[end])) end--;
+            if (end >= start && sc[start] != sc[end]) {
+                return false;
+            } else {
+                start++;
+                end--;
+            }
+        }
+        return true;
+    }
+
+    public int singleNumber(int[] nums) {
+        int num = 0;
+        for (int i : nums) {
+            num ^= i;
+        }
+        return num;
+    }
+
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return false;
+        }
+        ListNode slow = head;
+        ListNode fast = head.next;
+        while (slow != fast) {
+            if (fast == null || fast.next == null) {
+                return false;
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return true;
+    }
+
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) {
+            return null;
+        }
+        ListNode pA = headA;
+        ListNode pB = headB;
+        while (pA != pB) {
+            pA = pA == null ? headB : pA.next;
+            pB = pB == null ? headA : pB.next;
+        }
+        return pA;
+    }
+
+    public int[] twoSum(int[] numbers, int target) {
+        int[] result = new int[2];
+        int low = 0;
+        int high = numbers.length-1;
+        while(low < high){
+            if (numbers[low] + numbers[high] > target) {
+                high--;
+            } else if (numbers[low] + numbers[high] < target) {
+                low++;
+            }
+            else {
+                result[0] = ++low;
+                result[1] = ++high;
+                break;
+            }
+        }
+        return result;
+    }
+
+
+    public static String convertToTitle(int n) {
+        if (n <= 0) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        while (n > 0) {
+            n--;
+            sb.append((char) (n % 26 + 'A'));
+            n =n / 26;
+        }
+        return sb.reverse().toString();
+    }
+
+    public static int titleToNumber(String s) {
+        int res = 0;
+        char[] temp = s.toCharArray();
+        for (int i = temp.length - 1; i >= 0; i--) {
+            res += (temp[i] - 'A' + 1) * Math.pow(26, temp.length - i - 1);
+        }
+
+        return res;
+    }
+
+    public static int trailingZeroes(int n) {
+        int count = 0;
+        while (n > 0) {
+            count += n / 5;
+            n = n / 5;
+
+        }
+        return count;
+    }
+
+    public boolean find(int target, int[][] array) {
+        int row=0;
+        int col=array[0].length-1;
+        while(row<=array.length-1&&col>=0){
+            if(target==array[row][col])
+                return true;
+            else if(target>array[row][col])
+                row++;
+            else
+                col--;
+        }
+        return false;
+
+    }
+
+    public static String replaceSpace(StringBuffer str) {
+        return  str.toString().replace(" ","%20");
+    }
+
+    public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
+        ArrayList<Integer> res = new ArrayList<Integer>();
+        while(listNode != null){
+            res.add(listNode.val);
+            listNode = listNode.next;
+        }
+        Collections.reverse(res);
+        return res;
+    }
+
+    public static void rotate(int[] nums, int k) {
+        k = k % nums.length;
+        for (int i = 0; i < k; i++) {
+            nums[i] = nums[i+k];
+        }
+    }
+
+    // you need to treat n as an unsigned value
+    public int hammingWeight(int n) {
+        int result = 0;
+        String unsignedString = Integer.toUnsignedString(n,2);
+        for (char c : unsignedString.toCharArray()) {
+            if (c=='1'){
+                result++;
+            }
+        }
+        return result;
+    }
+
+    public int rob(int[] nums) {
+        int m = 0, n = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (i % 2 == 0) {
+                m += nums[i];
+            } else {
+                n += nums[i];
+            }
+        }
+        return Math.max(m, n);
+    }
+
+    public boolean isHappy(int n) {
+        int sum = 0;
+        Set<Integer> set = new HashSet<>();
+
+        while (sum != 1) {
+            sum = 0;
+            while (n > 0) {
+                sum = sum + (int) Math.pow(n % 10, 2);
+                n = n / 10;
+            }
+            if (set.contains(sum)) {
+                return false;
+            }
+            set.add(sum);
+            n = sum;
+        }
+
+        return true;
+    }
+
+    public int countPrimes(int n) {
+        boolean[] isPrime = new boolean[n];
+        Arrays.fill(isPrime, true);
+        for (int i = 2; i*i < n; i++) {
+            if (isPrime[i]) {
+                for (int j = i * i; j < n; j += i) {
+                    isPrime[j] = false;
+                }
+            }
+        }
+        int count = 0;
+        for (int i = 2; i < isPrime.length; i++) {
+            if (isPrime[i]) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            TreeNode right = node.right;
+            node.right = node.left;
+            node.left = right;
+            if (node.left != null) {
+                queue.offer(node.left);
+            }
+            if (node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+        return root;
+    }
+
+    public boolean isPowerOfTwo(int n) {
+        return (n & (n - 1)) == 0;
+    }
+
+
+
+    public static void main(String[] args) {
+
+    }
+
+
 }
 
 
