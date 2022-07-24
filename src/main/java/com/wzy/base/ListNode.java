@@ -1,4 +1,4 @@
-package com.wzy.train;
+package com.wzy.base;
 
 /**
  * @Author: wzy
